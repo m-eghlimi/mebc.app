@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 import logging
 import os
 from dotenv import load_dotenv
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # تنظیمات مربوط به لاگ‌ها
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levellevel)s - %(message)s',
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
@@ -36,25 +36,24 @@ def main():
     # دریافت پورت از متغیر محیطی
     port = int(os.environ.get('PORT', 8443))
 
-    # ساخت یک آپدیتور با توکن ربات و تنظیمات وب‌هوک
-    updater = Updater(token, use_context=True)
+    # ساخت یک Application با توکن ربات و تنظیمات وب‌هوک
+    application = Application.builder().token(token).build()
 
     # تنظیم وب‌هوک
-    updater.start_webhook(listen="0.0.0.0",
-                          port=port,
-                          url_path=token)
-    updater.bot.setWebhook(f'https://9f813d90875c104f7616f67dac787130.serveo.net/{token}')
-
-    dispatcher = updater.dispatcher
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=port,
+        url_path=token,
+        webhook_url=f'https://9f813d90875c104f7616f67dac787130.serveo.net/{token}'
+    )
 
     # اضافه کردن هندلرها
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # شروع سرویس‌دهی
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
