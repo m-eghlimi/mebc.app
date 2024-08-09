@@ -10,13 +10,13 @@ bot = telegram.Bot(token=TOKEN)
 def webhook():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat.id
-    text = update.message.text.lower()  # تبدیل متن به حروف کوچک برای سازگاری
+    text = update.message.text
 
-    if text == '/start':
-        bot.sendMessage(chat_id=chat_id, text="خوش آمدید!")
+    if text == "/start":
+        bot.sendMessage(chat_id=chat_id, text="Welcome! How can I help you today?")
     else:
         bot.sendMessage(chat_id=chat_id, text="You said: " + text)
-
+    
     return 'ok'
 
 if __name__ == '__main__':
