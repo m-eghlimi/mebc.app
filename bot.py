@@ -5,7 +5,7 @@ from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 app = Flask(__name__)
 
 # وارد کردن توکن ربات تلگرام خود
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
+TOKEN = "6899423972:AAFHpBMeUtI5PpKjkZLI1i4xTsKcOAA62LU"
 bot = Bot(token=TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0)
 
