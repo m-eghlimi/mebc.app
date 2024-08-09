@@ -12,8 +12,14 @@ ADMIN_ID = int(os.getenv("ADMIN_ID"))
 # Initialize bot
 bot = Bot(token=TELEGRAM_TOKEN)
 
+# Mock database for users
+users = set()
+
 def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
+    if user_id not in users:
+        users.add(user_id)
+    
     if user_id == ADMIN_ID:
         update.message.reply_text("Welcome, Admin!")
     else:
@@ -22,8 +28,8 @@ def start(update: Update, context: CallbackContext) -> None:
 def admin(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
     if user_id == ADMIN_ID:
-        update.message.reply_text("This is the admin panel.", 
-                                  reply_markup=ReplyKeyboardMarkup([['Admin Box']], resize_keyboard=True))
+        update.message.reply_text("Admin panel:", 
+                                  reply_markup=ReplyKeyboardMarkup([['Admin Box', 'User List', 'Broadcast']], resize_keyboard=True))
     else:
         update.message.reply_text("You are not authorized to access this command.")
 
@@ -31,6 +37,24 @@ def admin_box(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
     if user_id == ADMIN_ID:
         update.message.reply_text("This is your admin box!")
+    else:
+        update.message.reply_text("You are not authorized to access this command.")
+
+def user_list(update: Update, context: CallbackContext) -> None:
+    user_id = update.message.from_user.id
+    if user_id == ADMIN_ID:
+        user_list_text = "\n".join([str(user) for user in users])
+        update.message.reply_text(f"Registered users:\n{user_list_text}")
+    else:
+        update.message.reply_text("You are not authorized to access this command.")
+
+def broadcast(update: Update, context: CallbackContext) -> None:
+    user_id = update.message.from_user.id
+    if user_id == ADMIN_ID:
+        message = " ".join(context.args)
+        for user in users:
+            bot.send_message(chat_id=user, text=f"Broadcast message:\n{message}")
+        update.message.reply_text("Broadcast message sent.")
     else:
         update.message.reply_text("You are not authorized to access this command.")
 
@@ -48,6 +72,8 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("admin", admin))
     dispatcher.add_handler(MessageHandler(Filters.regex('^Admin Box$'), admin_box))
+    dispatcher.add_handler(MessageHandler(Filters.regex('^User List$'), user_list))
+    dispatcher.add_handler(CommandHandler("broadcast", broadcast))
 
     # on non-command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
