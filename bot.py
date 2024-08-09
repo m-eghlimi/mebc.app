@@ -3,7 +3,7 @@ import telegram
 
 app = Flask(__name__)
 
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
+TOKEN = "6899423972:AAFHpBMeUtI5PpKjkZLI1i4xTsKcOAA62LU"
 bot = telegram.Bot(token=TOKEN)
 
 @app.route('/webhook', methods=['POST'])
