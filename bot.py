@@ -1,9 +1,10 @@
 from flask import Flask, request
 from telegram import Update, Bot
-from telegram.ext import Dispatcher, CommandHandler
+from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 
 app = Flask(__name__)
 
+# وارد کردن توکن ربات تلگرام خود
 TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 bot = Bot(token=TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0)
@@ -21,7 +22,7 @@ def echo(update, context):
     update.message.reply_text(update.message.text)
 
 dispatcher.add_handler(CommandHandler("start", start))
-dispatcher.add_handler(CommandHandler("echo", echo))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
